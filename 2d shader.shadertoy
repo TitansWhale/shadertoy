@@ -1,0 +1,156 @@
+vec2 box = vec2(0.6,0.6);
+float boxHeight=0.10;
+vec3 boxColor=vec3(1.,0.,0.);
+
+vec2 lightCenter = vec2(0.5,0.5);
+float lightLenth = 0.60;
+float a=1.;				//metaball 缩放比例
+
+vec3 lightColor = vec3(1.0,1.0,1.0);
+vec3 bgColor = vec3(0,0,0);
+
+bool inRect(vec2 t,vec2 p1,vec2 p2,vec2 p3,vec2 p4)//点是否在矩形内部1测试的点,2绘制的四边形
+{
+    vec3 v1=vec3(p1-t,0.0);
+    vec3 v2=vec3(p2-t,0.0);
+    vec3 v3=vec3(p3-t,0.0);
+    vec3 v4=vec3(p4-t,0.0);
+    
+    float a= cross(v1,v2).z;
+    float b= cross(v2,v3).z;
+    float c= cross(v3,v4).z;
+    float d= cross(v4,v1).z;
+    
+    if((a > 0. && b > 0. && c > 0. && d > 0.) || (a < 0. && b < 0. && c < 0. && d < 0.)) 
+            return true;
+    return false;
+}
+
+bool draw(vec2 p1,vec2 p2,vec2 c,vec2 uv)//绘制阴影1第一个点,2第二个点,3光心,4uv
+{
+    //获得向量
+    vec2 v1 = p1-c;
+    vec2 v2 = p2-c;
+    
+    v1=normalize(v1);
+    v2=normalize(v2);
+    
+    //获得点
+    vec2 p3=c+v2*2.0;
+    vec2 p4=c+v1*2.0;
+    
+    //绘制点
+    if(inRect(uv,p1,p2,p3,p4))
+    	return true;
+    return false;
+    
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    
+    
+    box.x=sin(iTime*0.5)*0.3+0.5;
+    // Normalized pixel coordinates (from 0 to 1)
+    vec2 uv = fragCoord/iResolution.xy;
+	
+    
+    //绘制背景
+    vec3 col=bgColor;
+    
+    //绘制metaball
+    float r=distance(lightCenter,uv);
+    
+	if(r<lightLenth)
+    {
+        float temp=r*r/lightLenth/lightLenth;
+       	temp=1.0-temp;
+        temp*=temp;
+        temp*=a;
+        
+    	col=temp*lightColor;
+     
+    }   
+	//绘制阴影
+    
+    vec2 p1 = box;
+    vec2 p2 = vec2(box.x+boxHeight,box.y);
+    vec2 p3 = vec2(box.x,box.y+boxHeight);
+    vec2 p4 = vec2(box.x+boxHeight,box.y+boxHeight);
+    
+    
+    
+    vec2 v1 = p1-lightCenter;
+    vec2 v2 = p2-lightCenter;
+    vec2 v3 = p3-lightCenter;
+    vec2 v4 = p4-lightCenter;
+    
+    v1=normalize(v1);
+    v2=normalize(v2);
+    v3=normalize(v3);
+    v4=normalize(v4);
+    
+    	//找到最大夹角两个点
+    vec2 outp1=p1;
+    vec2 outp2=p2;							//1
+    float temp=dot(v1,v2);
+    float min=temp;
+    
+    temp = dot(v1,v3);							//2
+    if(temp<min)
+    {
+        outp1=p1;
+        outp2=p3;
+        min=temp;
+    }
+    
+    temp = dot(v1,v4);							//3
+    if(temp<min)
+    {
+        outp1=p1;
+        outp2=p4;
+        min=temp;
+    }
+    
+    temp = dot(v2,v3);							//4
+    if(temp<min)
+    {
+        outp1=p2;
+        outp2=p3;
+        min=temp;
+    }
+    
+    temp = dot(v2,v4);							//5
+    if(temp<min)
+    {
+        outp1=p2;
+        outp2=p4;
+        min=temp;
+    }
+    
+    temp = dot(v3,v4);							//6
+    if(temp<min)
+    {
+        outp1=p3;
+        outp2=p4;
+        min=temp;
+    }
+    
+  	if(draw(outp1,outp2,lightCenter,uv))
+       col=bgColor;
+    
+    
+    //绘制box
+    if(uv.x<box.x+boxHeight&&uv.x>box.x)
+        if(uv.y<box.y+boxHeight&&uv.y>box.y)
+        {
+            col=boxColor;
+        }
+    
+    if(distance(uv,lightCenter)<0.01)
+        col=vec3(0,1.0,0.0);
+    // Output to screen
+    fragColor = vec4(col,1.0);
+    
+    
+}
