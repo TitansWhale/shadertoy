@@ -25,6 +25,9 @@ float sdSphere( vec3 p, float s )//离球壳距离越远值越大 </br>
 } </br>
 
 通过场值设定步长(距离越远迈的步子越大) </br>
+每根射线走100步基本都会落在球体上.</br>
+参考代码:
+https://www.jianshu.com/p/46e161b911dd
 
 
 更多场公式:  </br>
