@@ -27,7 +27,7 @@ float sdSphere( vec3 p, float s )//离球壳距离越远值越大 </br>
 通过场值设定步长(距离越远迈的步子越大) </br>
 
 
-更多场公式: </br>
+更多场公式:  </br>
 http://www.iquilezles.org/www/articles/distfunctions/distfunctions.htm
 
 
