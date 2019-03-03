@@ -10,3 +10,28 @@
 
 
 https://www.shadertoy.com/view/WdlXW7
+
+
+# shadertoy RayMarching
+
+RayMarching是光线投射算法中的一种暴力实现,是为了实现射线与几何体求交
+## 思路:模拟光线发射,每次走一定距离直到碰到几何体表面
+
+场的概念这里介绍球体距离场:标量和距离有关
+
+float sdSphere( vec3 p, float s )//离球壳距离越远值越大
+{
+  return length(p)-s;
+}
+
+通过场值设定步长(距离越远迈的步子越大)
+
+
+更多场公式:
+http://www.iquilezles.org/www/articles/distfunctions/distfunctions.htm
+
+
+
+
+
+
